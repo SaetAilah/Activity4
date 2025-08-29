@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity 4</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    strong {
+      font-weight: bold;
+    }
+    
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+    .shake {
+      animation: shake 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <h3>Press <b>Ctrl + Alt + N</b> to open the form</h3>
+  <form id="myForm" style="display: none;  margin-top: 15px;  padding: 15px;  border: 1px solid #ccc;  border-radius: 8px;  width: 300px;">
+    <label>Name:</label><br>
+    <input type="text" name="name" required><br><br>
+
+    <label>Age:</label><br>
+    <input type="number" name="age" required><br><br>
+
+    <label>Gender:</label><br>
+    <select name="gender" id="gender" required>
+      <option value="MALE">MALE</option>
+      <option value="FEMALE">FEMALE</option>
+      <option value="OTHER">OTHER</option>
+    </select><br><br>
+
+    
+    <div id="otherGenderField" style="display: none;">
+      <label>Please specify your gender:</label><br>
+      <input type="text" id="otherGenderInput" name="otherGender"><br><br>
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="formOutput" style="margin-top: 20px;  padding: 15px;  border: 1px solid #ccc;  border-radius: 8px;  width: 300px; background: #f9f9f9;"></div>
+
+  <script>
+    const myForm = document.getElementById('myForm');
+    const formOutput = document.getElementById('formOutput');
+    const genderSelect = document.getElementById('gender');
+    const otherGenderField = document.getElementById('otherGenderField');
+    const otherGenderInput = document.getElementById('otherGenderInput');
+
+    
+    document.addEventListener('keydown', function (e) {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'n') {
+        myForm.style.display = (myForm.style.display === 'none' || myForm.style.display === '') 
+          ? 'block' : 'none';
+      }
+      if (e.key === "Escape") {
+        myForm.reset();
+        otherGenderField.style.display = "none";
+      }
+    });
+
+    
+    genderSelect.addEventListener('change', function () {
+      if (this.value === "OTHER") {
+        otherGenderField.style.display = "block";
+      } else {
+        otherGenderField.style.display = "none";
+        otherGenderInput.value = "";
+      }
+    });
+
+    
+    myForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData);
+
+      
+      if (data.gender === "OTHER" && !data.otherGender.trim()) {
+        myForm.classList.add("shake");
+        setTimeout(() => myForm.classList.remove("shake"), 300);
+        return; 
+      }
+
+      
+      const d={name: data.name,
+      age: data.age,
+      gender: data.gender === "OTHER" ? data.otherGender : data.gender};
+      localStorage.setItem("userData",JSON.stringify(d))
+      myForm.style.display="none"
+      formOutput.innerHTML=`
+      <strong>Submitted Data:</strong><br><br>
+      <strong>Name:</strong> ${d.name}<br>
+      <strong>Age:</strong> ${d.age}<br>
+      <strong>Gender:</strong> ${d.gender}
+    `;
+      alert("Submitted!!")
+    });
+
+    const save=localStorage.getItem("userData")
+    if(save){
+      const d2=JSON.parse(save)
+      formOutput.innerHTML="Name:"+d2.name+"<br>Age:"+d2.age+"<br>Gender:"+d2.gender
+    };
+  </script>
+</body>
+</html>
